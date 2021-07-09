@@ -32,6 +32,13 @@
     </repository>
   </distributionManagement>
 
+  <scm>
+    <url>https://github.com/java-repeat/java-repeat</url>
+    <connection>scm:git:git://github.com/java-repeat/java-repeat.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/java-repeat/java-repeat.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
