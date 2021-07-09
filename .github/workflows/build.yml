@@ -27,3 +27,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./mvnw -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+
+    - name: Check Sonar Status
+      run: |
+        status=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=java-repeat_java-repeat)
+        echo $status | jq '.'
+        status=$(echo $status | jq '.projectStatus.status')
+        test '"OK"' = $status
