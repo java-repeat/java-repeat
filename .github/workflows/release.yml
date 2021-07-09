@@ -51,9 +51,11 @@ jobs:
         uses: github/codeql-action/analyze@v1
 
       - name: Relase to Maven Central
-        run: ./mvnw clean release:prepare release:perform -s settings.xml
+        run: |
+          git config --global user.email "java-repeat@github.com"
+          git config --global user.name "java-repeat"
+          ./mvnw clean release:prepare release:perform -s settings.xml
+
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          GIT_AUTHOR_NAME: java-repeat
-          GIT_AUTHOR_EMAIL: java.repeat@github.com
