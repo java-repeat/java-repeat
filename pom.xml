@@ -9,6 +9,21 @@
   <description>
     Java Repeat provides an abstraction around running blocks of code multiple times.
   </description>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <email>matthew.js.porter@gmail.com</email>
+      <name>Matt Porter</name>
+      <url>https://github.com/matthew-js-porter</url>
+      <id>matthew-js-porter</id>
+    </developer>
+  </developers>
 
   <properties>
     <java.version>1.8</java.version>
