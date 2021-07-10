@@ -21,6 +21,9 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
@@ -56,8 +59,8 @@ jobs:
         run: |
           git config --global user.email "java-repeat@github.com"
           git config --global user.name "java-repeat"
-          ./mvnw clean release:prepare release:perform -s settings.xml
+          ./mvnw --batch-mode clean release:prepare release:perform
 
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
