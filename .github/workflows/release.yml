@@ -64,7 +64,7 @@ jobs:
         run: |
           git config --global user.email "java-repeat@github.com"
           git config --global user.name "java-repeat"
-          ./mvnw --batch-mode clean release:prepare release:perform
+          ./mvnw --batch-mode clean release:prepare release:perform -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
