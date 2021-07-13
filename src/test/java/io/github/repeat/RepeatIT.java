@@ -3,7 +3,6 @@ package io.github.repeat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.github.repeat.Repeat.repeat;
