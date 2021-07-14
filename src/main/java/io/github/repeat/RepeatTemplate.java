@@ -3,6 +3,9 @@ package io.github.repeat;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Repeats RepeatCallbacks a defined amount of times
+ */
 public class RepeatTemplate implements RepeatOperations {
     @Override
     public <T, E extends Throwable> List<T> repeat(final RepeatCallback<T, E> repeatCallback, final int times) throws E {
