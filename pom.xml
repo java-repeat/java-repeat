@@ -3,7 +3,7 @@
   <groupId>io.github.java-repeat</groupId>
   <artifactId>repeat</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.9-SNAPSHOT</version>
+  <version>0.0.9</version>
   <name>Java Repeat</name>
   <url>https://java-repeat.github.io/</url>
   <description>
@@ -50,7 +50,7 @@
     <url>https://github.com/java-repeat/java-repeat</url>
     <connection>scm:git:https://github.com/java-repeat/java-repeat.git</connection>
     <developerConnection>scm:git:https://github.com/java-repeat/java-repeat.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>repeat-0.0.9</tag>
   </scm>
 
   <dependencies>
