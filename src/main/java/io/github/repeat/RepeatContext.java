@@ -1,15 +1,16 @@
 package io.github.repeat;
 
-public class RepeatContext<E extends Throwable> {
-    private final RepeatCallback<E> repeatCallback;
+import java.util.List;
 
-    public RepeatContext(final RepeatCallback<E> repeatCallback) {
-        this.repeatCallback = repeatCallback;
+public class RepeatContext {
+    private int times;
+
+    public RepeatContext times(final int times) {
+        this.times = times;
+        return this;
     }
 
-    public void times(final int times) throws E {
-        for(int i = 0; i < times; i++) {
-            repeatCallback.doWithRepeat(i);
-        }
+    public <T, E extends Throwable> List<T> repeat(RepeatCallback<T, E> teRepeatCallback) throws E {
+        return new RepeatTemplate().repeat(teRepeatCallback, times);
     }
 }
