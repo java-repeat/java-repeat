@@ -3,7 +3,7 @@
   <groupId>io.github.java-repeat</groupId>
   <artifactId>repeat</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.9-SNAPSHOT</version>
+  <version>0.0.10-SNAPSHOT</version>
   <name>Java Repeat</name>
   <url>https://java-repeat.github.io/</url>
   <description>
