@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static io.github.repeat.Repeat.repeat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -15,15 +16,15 @@ class RepeatIT {
         final AtomicInteger count = new AtomicInteger();
         final int times = 3;
 
-        Repeat.of().times(times).repeat((index -> count.getAndIncrement()));
+        repeat(times, i -> count.incrementAndGet());
 
         assertEquals(times, count.intValue());
     }
 
-    @Test()
+    @Test
     @DisplayName("repeat error example")
     void throwError() {
-        assertThrows(Exception.class, ()-> Repeat.of().times(100).repeat(index -> {
+        assertThrows(Exception.class, () -> repeat(100, i -> {
             throw new Exception("ERROR!");
         }));
     }
