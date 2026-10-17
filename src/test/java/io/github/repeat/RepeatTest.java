@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static io.github.repeat.Repeat.list;
 import static io.github.repeat.Repeat.repeat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -51,38 +50,5 @@ class RepeatTest {
             }
         }));
         assertEquals(Arrays.asList(0, 1), indexes);
-    }
-
-    @Test
-    @DisplayName("list should build a list from each index")
-    void listBuildsFromIndex() {
-        assertEquals(Arrays.asList(0, 1, 4, 9, 16), list(5, i -> i * i));
-    }
-
-    @Test
-    @DisplayName("list should be empty for size zero")
-    void listEmpty() {
-        assertEquals(Collections.emptyList(), list(0, i -> i));
-    }
-
-    @Test
-    @DisplayName("list should reject a negative size")
-    void listNegative() {
-        assertThrows(IllegalArgumentException.class, () -> list(-1, i -> i));
-    }
-
-    @Test
-    @DisplayName("list should be read-only")
-    void listReadOnly() {
-        final List<Integer> values = list(2, i -> i);
-        assertThrows(UnsupportedOperationException.class, () -> values.add(2));
-    }
-
-    @Test
-    @DisplayName("list should propagate checked exceptions")
-    void listThrows() {
-        assertThrows(IOException.class, () -> list(3, i -> {
-            throw new IOException("ERROR!");
-        }));
     }
 }

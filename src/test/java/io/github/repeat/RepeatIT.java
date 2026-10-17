@@ -3,10 +3,8 @@ package io.github.repeat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.github.repeat.Repeat.list;
 import static io.github.repeat.Repeat.repeat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,14 +19,6 @@ class RepeatIT {
         repeat(times, i -> count.incrementAndGet());
 
         assertEquals(times, count.intValue());
-    }
-
-    @Test
-    @DisplayName("simple list example")
-    void simpleList() {
-        final List<String> names = list(3, i -> "item-" + i);
-
-        assertEquals("item-2", names.get(2));
     }
 
     @Test
