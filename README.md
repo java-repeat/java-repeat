@@ -20,12 +20,12 @@ As in Kotlin, a zero or negative count does nothing.
 
 ## Maven
 
-This API will ship in the next release (0.0.10). 0.0.9 and earlier have the old `Repeat.of().times(n).repeat(...)` API.
+This API will ship in the next release (1.0.0). 0.0.9 and earlier have the old `Repeat.of().times(n).repeat(...)` API.
 
 ```xml
 <dependency>
   <groupId>io.github.java-repeat</groupId>
   <artifactId>repeat</artifactId>
-  <version>0.0.10</version>
+  <version>1.0.0</version>
 </dependency>
 ```
