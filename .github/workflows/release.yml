@@ -42,14 +42,14 @@ jobs:
         run: ./mvnw -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
       - name: Check Sonar Status
-        run: |
-          status=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=java-repeat_java-repeat)
-          echo $status | jq '.'
-          status=$(echo $status | jq '.projectStatus.status')
-          test '"OK"' = $status
+        # Pinned to the v1 tag rather than a commit SHA on purpose, so v1 updates are picked up
+        uses: sonarcloud-actions/sonarcloud-check-status-action@v1 # NOSONAR
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/maven@master
+        # Tracks the Snyk master branch rather than a commit SHA on purpose, so Snyk updates are picked up
+        uses: snyk/actions/maven@master # NOSONAR
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           JAVA_HOME: /usr/java/openjdk-16
