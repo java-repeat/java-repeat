@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo/wordmark-white.svg">
+    <img src="assets/logo/wordmark.svg" alt="java-repeat" width="360">
+  </picture>
+</p>
+
 # java-repeat
 
 Kotlin-style repetition for Java, with support for checked exceptions.
