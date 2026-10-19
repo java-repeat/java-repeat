@@ -52,6 +52,8 @@ jobs:
         uses: snyk/actions/maven-3-jdk-17@master # NOSONAR
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          # setup-java exports the runner JDK path, which does not exist inside the Snyk container
+          JAVA_HOME: /opt/java/openjdk
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
