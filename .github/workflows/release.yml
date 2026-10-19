@@ -48,7 +48,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/maven@master
+        # Tracks the Snyk master branch rather than a commit SHA on purpose, so Snyk updates are picked up
+        uses: snyk/actions/maven@master # NOSONAR
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           JAVA_HOME: /usr/java/openjdk-16
