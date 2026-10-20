@@ -12,3 +12,6 @@ buildNumber.properties
 
 .idea
 *.iml
+
+### Skill evals (skill-creator workspaces) ###
+.claude/skills/*-workspace/

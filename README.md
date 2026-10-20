@@ -57,3 +57,23 @@ Coming from 0.0.9 or earlier (`Repeat.of().times(n).repeat(...)`)? See [Migratin
 - [Docs](https://java-repeat.github.io): getting started, guides and the API reference
 - [Javadoc](https://javadoc.io/doc/io.github.java-repeat/repeat)
 - [Releases](https://github.com/java-repeat/java-repeat/releases)
+
+## Release notes skill
+
+Release notes are written by the `/release-notes` skill in [`.claude/skills/release-notes`](.claude/skills/release-notes). The release workflow runs it with the Claude GitHub Action after each release and publishes the result as the GitHub release. You can also run it yourself in Claude Code, for example `/release-notes repeat-1.0.1`.
+
+### Running the skill evals
+
+The skill's eval cases are in [`evals/evals.json`](.claude/skills/release-notes/evals/evals.json). Run them with Anthropic's [skill-creator](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/skill-creator) plugin:
+
+1. Start Claude Code in the repository root. skill-creator is enabled in [`.claude/settings.json`](.claude/settings.json); accept the install prompt the first time, or run `/plugin install skill-creator@claude-plugins-official`.
+2. Evaluate the skill:
+
+   ```text
+   /skill-creator eval release-notes
+   ```
+
+   To measure an edit, compare against the version on `develop`, for example `/skill-creator eval release-notes, comparing against the skill on origin/develop`.
+3. skill-creator runs each eval in a fresh subagent, grades every expectation, and opens a review page with the outputs and a benchmark (pass rate, time, tokens). Results go to `.claude/skills/release-notes-workspace/`, which is gitignored.
+
+The evals use the real release tags, so fetch them first (`git fetch --tags`). When the skill gets something wrong in a real release, add a case to `evals/evals.json`.
