@@ -97,17 +97,3 @@ jobs:
             '```')
           gh release create "$TAG" --title "$VERSION" --verify-tag --latest --generate-notes --notes "$notes"
 
-      # Needs a DOCS_DISPATCH_TOKEN secret: a fine-grained token with Contents read/write
-      # on java-repeat/java-repeat.github.io. Without it the docs catch up on their daily build.
-      - name: Update the docs site
-        env:
-          GH_TOKEN: ${{ secrets.DOCS_DISPATCH_TOKEN }}
-          VERSION: ${{ steps.released.outputs.version }}
-        run: |
-          if [ -z "$GH_TOKEN" ]; then
-            echo "::warning::DOCS_DISPATCH_TOKEN is not set; the docs site will pick up $VERSION on its daily build"
-            exit 0
-          fi
-          gh api repos/java-repeat/java-repeat.github.io/dispatches \
-            -f event_type=library-released \
-            -f "client_payload[version]=$VERSION"
