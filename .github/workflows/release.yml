@@ -69,3 +69,45 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+      # release:prepare tagged the previous commit; HEAD is the next snapshot.
+      - name: Find the released version
+        id: released
+        run: |
+          tag=$(git describe --tags --abbrev=0)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#repeat-}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.released.outputs.tag }}
+          VERSION: ${{ steps.released.outputs.version }}
+        run: |
+          notes=$(printf '%s\n' \
+            '```xml' \
+            '<dependency>' \
+            '  <groupId>io.github.java-repeat</groupId>' \
+            '  <artifactId>repeat</artifactId>' \
+            "  <version>$VERSION</version>" \
+            '</dependency>' \
+            '```' \
+            '' \
+            '```kotlin' \
+            "implementation(\"io.github.java-repeat:repeat:$VERSION\")" \
+            '```')
+          gh release create "$TAG" --title "$VERSION" --verify-tag --latest --generate-notes --notes "$notes"
+
+      # Needs a DOCS_DISPATCH_TOKEN secret: a fine-grained token with Contents read/write
+      # on java-repeat/java-repeat.github.io. Without it the docs catch up on their daily build.
+      - name: Update the docs site
+        env:
+          GH_TOKEN: ${{ secrets.DOCS_DISPATCH_TOKEN }}
+          VERSION: ${{ steps.released.outputs.version }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::DOCS_DISPATCH_TOKEN is not set; the docs site will pick up $VERSION on its daily build"
+            exit 0
+          fi
+          gh api repos/java-repeat/java-repeat.github.io/dispatches \
+            -f event_type=library-released \
+            -f "client_payload[version]=$VERSION"
