@@ -11,6 +11,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.released.outputs.tag }}
+      version: ${{ steps.released.outputs.version }}
 
     steps:
       - uses: actions/checkout@v7
@@ -69,3 +72,45 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+      # release:prepare tagged the previous commit; HEAD is the next snapshot.
+      - name: Find the released version
+        id: released
+        run: |
+          tag=$(git describe --tags --abbrev=0)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#repeat-}" >> "$GITHUB_OUTPUT"
+
+  # Claude writes the release notes and publishes the GitHub release.
+  release-notes:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      TAG: ${{ needs.build.outputs.tag }}
+      VERSION: ${{ needs.build.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0    # Earlier tags and history for the notes
+          persist-credentials: false
+
+      - name: Find the previous release
+        id: previous
+        run: echo "tag=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || true)" >> "$GITHUB_OUTPUT"
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            /release-notes ${{ env.TAG }} ${{ steps.previous.outputs.tag }}
+
+            You are running unattended in CI after java-repeat ${{ env.VERSION }} was published to Maven Central. Nobody can answer questions.
+
+            After the skill has written release-notes.md, publish it with exactly:
+            `gh release create ${{ env.TAG }} --title ${{ env.VERSION }} --verify-tag --latest --notes-file release-notes.md`
+          claude_args: >-
+            --max-turns 15
+            --allowedTools "Skill,Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git describe:*),Bash(gh release create:*),Read,Write"

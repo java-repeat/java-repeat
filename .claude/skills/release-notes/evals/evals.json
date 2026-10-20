@@ -1,0 +1,40 @@
+{
+  "skill_name": "release-notes",
+  "evals": [
+    {
+      "id": 1,
+      "name": "breaking-release",
+      "prompt": "/release-notes repeat-1.0.1 repeat-0.0.9\n\nYou are running unattended. Nobody can answer questions.\n\n(Test run: save release-notes.md under your outputs directory instead of the repository root. Change no file in the repository.)",
+      "expected_output": "Notes for 1.0.1 that lead with a short summary, list the move from Repeat.of().times(n).repeat(...) to the static repeat(n, action) as a breaking change with before/after code, mention that results are no longer collected into a list, and end with Maven and Gradle snippets for 1.0.1 and a compare link from repeat-0.0.9 to repeat-1.0.1.",
+      "files": [],
+      "expectations": [
+        "A release-notes.md was written in the outputs directory and nowhere else.",
+        "The notes have no top-level title or version heading.",
+        "There is a '## Breaking changes' section that shows Repeat.of().times(...).repeat(...) being replaced by repeat(n, ...) in a code block.",
+        "The breaking changes say that repeat now returns void and no longer returns a List of results.",
+        "The breaking changes mention RepeatCallback being replaced by IndexedAction.",
+        "The '## Install' section has a Maven dependency with version 1.0.1 and the line implementation(\"io.github.java-repeat:repeat:1.0.1\").",
+        "The last line is a Full changelog link to https://github.com/java-repeat/java-repeat/compare/repeat-0.0.9...repeat-1.0.1.",
+        "The notes do not describe CI, Sonar, Snyk or GitHub Actions changes as user-facing changes.",
+        "The '## Changes' section does not list behavior 0.0.9 already had: zero or negative counts running nothing, the zero-based index, or checked exceptions propagating.",
+        "The notes contain no emoji and no exclamation marks, and never write the name as 'Java Repeat' or 'JavaRepeat'.",
+        "The transcript shows no gh release create, git tag, git commit or git push."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "pipeline-only-release",
+      "prompt": "/release-notes repeat-0.0.8\n\nYou are running unattended. Nobody can answer questions.\n\n(Test run: save release-notes.md under your outputs directory instead of the repository root. Change no file in the repository.)",
+      "expected_output": "The skill finds repeat-0.0.7 as the previous tag on its own. Short notes saying the release only changes how the artifact is built and signed, with no API changes, followed by the install snippets for 0.0.8 and a compare link from repeat-0.0.7.",
+      "files": [],
+      "expectations": [
+        "A release-notes.md was written in the outputs directory and nowhere else.",
+        "The notes do not have a '## Breaking changes' section.",
+        "The notes do not claim any new API, feature or behavior change in the library.",
+        "The '## Install' section uses version 0.0.8.",
+        "The last line is a Full changelog link to https://github.com/java-repeat/java-repeat/compare/repeat-0.0.7...repeat-0.0.8.",
+        "The transcript shows no gh release create, git tag, git commit or git push."
+      ]
+    }
+  ]
+}
