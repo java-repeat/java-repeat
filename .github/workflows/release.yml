@@ -102,8 +102,6 @@ jobs:
         run: echo "tag=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || true)" >> "$GITHUB_OUTPUT"
 
       - uses: anthropics/claude-code-action@v1
-        # A Claude outage must never lose the release; the next step covers it.
-        continue-on-error: true
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
@@ -116,15 +114,3 @@ jobs:
           claude_args: >-
             --max-turns 15
             --allowedTools "Skill,Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git describe:*),Bash(gh release create:*),Read,Write"
-
-      # Runs only if Claude did not publish the release.
-      - name: Fall back to generated notes
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $TAG exists."
-            exit 0
-          fi
-          echo "::warning::Claude did not publish $TAG; creating it with GitHub's generated notes"
-          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$VERSION" --verify-tag --latest --generate-notes
