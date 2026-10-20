@@ -16,6 +16,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0    # Earlier tags and history for the release notes
       - name: Set up JDK 17
         uses: actions/setup-java@v6
         with:
@@ -76,14 +77,58 @@ jobs:
           tag=$(git describe --tags --abbrev=0)
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "version=${tag#repeat-}" >> "$GITHUB_OUTPUT"
+          echo "previous=$(git describe --tags --abbrev=0 "$tag^" 2>/dev/null || true)" >> "$GITHUB_OUTPUT"
+
+      # Needs an ANTHROPIC_API_KEY secret. If this step fails, the release
+      # below falls back to GitHub's generated notes.
+      - name: Write release notes with Claude
+        id: notes
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            Write the GitHub release notes for java-repeat ${{ steps.released.outputs.version }}.
+            The release is tag ${{ steps.released.outputs.tag }}; the previous release is tag ${{ steps.released.outputs.previous }}.
+            Read the changes with `git log --no-merges ${{ steps.released.outputs.previous }}..${{ steps.released.outputs.tag }}`
+            and `git diff ${{ steps.released.outputs.previous }} ${{ steps.released.outputs.tag }} -- src/main pom.xml`.
+            Ignore the maven-release-plugin bookkeeping commits.
+
+            java-repeat is a small Java library: Kotlin-style repeat(n, i -> ...) with support for checked exceptions.
+            Readers are Java developers deciding whether and how to upgrade.
+
+            Style:
+            - Plain, short, declarative sentences. No emoji, no exclamation marks, no marketing adjectives.
+            - The name is always lowercase and hyphenated: java-repeat.
+            - Put identifiers, types and versions in `code`.
+            - Describe what changed for users of the library. Skip CI, build tooling, code style and test-only
+              changes unless they change what users get (for example the minimum Java version).
+
+            Return the notes as Markdown in the `notes` field, starting directly with the content (no title or version heading):
+            1. One or two sentences summarizing the release.
+            2. "## Breaking changes", only if there are any: each change and how to update code, with a short
+               before/after code block when a call site changes.
+            3. "## Changes" for new features, fixes and behavior changes, only if there are any.
+            Leave out install instructions and a changelog link; they are added afterwards.
+            Only state what the commits and diff support.
+          claude_args: |
+            --model claude-opus-5-5
+            --max-turns 10
+            --allowedTools "Bash(git log:*),Bash(git diff:*),Bash(git show:*),Read"
+            --json-schema '{"type":"object","properties":{"notes":{"type":"string"}},"required":["notes"]}'
 
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.released.outputs.tag }}
           VERSION: ${{ steps.released.outputs.version }}
+          PREVIOUS: ${{ steps.released.outputs.previous }}
+          STRUCTURED_OUTPUT: ${{ steps.notes.outputs.structured_output }}
         run: |
-          notes=$(printf '%s\n' \
+          install=$(printf '%s\n' \
+            '## Install' \
+            '' \
             '```xml' \
             '<dependency>' \
             '  <groupId>io.github.java-repeat</groupId>' \
@@ -95,5 +140,14 @@ jobs:
             '```kotlin' \
             "implementation(\"io.github.java-repeat:repeat:$VERSION\")" \
             '```')
-          gh release create "$TAG" --title "$VERSION" --verify-tag --latest --generate-notes --notes "$notes"
-
+          notes=""
+          [ -n "$STRUCTURED_OUTPUT" ] && notes=$(jq -r '.notes // empty' <<<"$STRUCTURED_OUTPUT" 2>/dev/null || true)
+          if [ -n "$notes" ]; then
+            changelog=""
+            [ -n "$PREVIOUS" ] && changelog="**Full changelog**: https://github.com/${GITHUB_REPOSITORY}/compare/$PREVIOUS...$TAG"
+            printf '%s\n\n%s\n\n%s\n' "$notes" "$install" "$changelog" > notes.md
+            gh release create "$TAG" --title "$VERSION" --verify-tag --latest --notes-file notes.md
+          else
+            echo "::warning::Claude did not write release notes; using GitHub's generated notes"
+            gh release create "$TAG" --title "$VERSION" --verify-tag --latest --generate-notes --notes "$install"
+          fi
