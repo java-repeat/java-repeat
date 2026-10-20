@@ -16,6 +16,7 @@
         "The '## Install' section has a Maven dependency with version 1.0.1 and the line implementation(\"io.github.java-repeat:repeat:1.0.1\").",
         "The last line is a Full changelog link to https://github.com/java-repeat/java-repeat/compare/repeat-0.0.9...repeat-1.0.1.",
         "The notes do not describe CI, Sonar, Snyk or GitHub Actions changes as user-facing changes.",
+        "The '## Changes' section does not list behavior 0.0.9 already had: zero or negative counts running nothing, the zero-based index, or checked exceptions propagating.",
         "The notes contain no emoji and no exclamation marks, and never write the name as 'Java Repeat' or 'JavaRepeat'.",
         "The transcript shows no gh release create, git tag, git commit or git push."
       ]
